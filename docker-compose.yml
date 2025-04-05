@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  calculator-service:
+    image: australia-southeast2-docker.pkg.dev/sit707-25t1-tepaiyan-8729201/my-docker-repo/calculator-service:latest
+    container_name: calculator-service
+    ports:
+      - "5001:5000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - app-network
+
+  gateway-service:
+    image: australia-southeast2-docker.pkg.dev/sit707-25t1-tepaiyan-8729201/my-docker-repo/gateway-service:latest
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - calculator-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - app-network
+
+  log-service:
+    image: australia-southeast2-docker.pkg.dev/sit707-25t1-tepaiyan-8729201/my-docker-repo/log-service:latest
+    container_name: log-service
+    ports:
+      - "5002:5000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
